@@ -181,6 +181,7 @@ public class FreebsdSerial extends SerialPort
 
 private native int  deviceOpen (String port) throws IOException;
 private native void deviceSendBreak(int sd, int i);
+private native void deviceSetReceiveTimeout(int sd, int i);
 
     protected boolean checkFlowControlModes (int modes)
     {
@@ -618,11 +619,13 @@ private native void deviceFlush(int sd);
         throws UnsupportedCommOperationException
     {
         timeout = i;
+        deviceSetReceiveTimeout(sd, i);
     }
 
     public void disableReceiveTimeout()
     {
         timeout = -1;
+        deviceSetReceiveTimeout(sd, -1);
     }
 
     public boolean isReceiveTimeoutEnabled()

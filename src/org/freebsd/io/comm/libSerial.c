@@ -114,8 +114,8 @@ JNIEXPORT jint JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceOpen
     tty.c_lflag = 0;
     tty.c_oflag = 0;
     tty.c_cflag = CREAD | CS8;
-    tty.c_cc [VMIN] = 0;
-    tty.c_cc [VTIME] = 1;
+    tty.c_cc [VMIN] = 1;
+    tty.c_cc [VTIME] = 0;
     if (cfsetspeed (&tty, B9600) <0)
     {
         throw_exception (env, IOEXCEPTION, "cfsetspeed ", strerror (errno));
@@ -143,6 +143,41 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceSendBreak
      * Freebsd ignores the len parameter according to the man pages...
      */
     tcsendbreak ((int)sd, 0);
+}
+
+/*
+ * Class:     org_freebsd_io_comm_FreebsdSerial
+ * Method:    deviceSetReceiveTimeout
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceSetReceiveTimeout
+  (JNIEnv *env, jobject jobj, jint sd, jint i)
+{
+    struct termios tty;
+
+    /* get termios structure for our serial port */
+    if (tcgetattr ((int)sd, &tty) < 0)
+    {
+        throw_exception (env, IOEXCEPTION, "tcgetattr ", strerror (errno));
+        return;
+    }
+
+    if (i > 0) {
+
+        tty.c_cc [VMIN] = 0;
+        tty.c_cc [VTIME] = i;
+    }
+    else {
+
+        tty.c_cc [VMIN] = 1;
+        tty.c_cc [VTIME] = 0;
+    }
+    
+    if (tcsetattr ((int)sd, TCSAFLUSH, &tty) < 0)
+    {
+        throw_exception (env, IOEXCEPTION, "tcsetattr ", strerror (errno));
+        return;
+    }
 }
 
 /*
