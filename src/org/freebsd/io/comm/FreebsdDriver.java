@@ -56,6 +56,7 @@ public class FreebsdDriver implements CommDriver {
                 String[] portPrefix = { "ttyd", //general purpose serial ports
                                         "cuaa", //dialout serial ports
                                         "ucom", //USB serial ports
+                                        "cuaU", //USB serial ports (FreeBSD 5.3)
                                         "ttyA", //Specialix SI/XIO dialin ports
                                         "cuaA", //Specialix SI/XIO dialout ports
                                         "ttyD", //Digiboard - 16 dialin ports
