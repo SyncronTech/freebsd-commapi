@@ -47,7 +47,6 @@ public class FreebsdSerial extends SerialPort
     private int                parity      = SerialPort.PARITY_NONE;
     private int                flowcontrol = SerialPort.FLOWCONTROL_NONE;
     private int                sd          = -1;
-    private String             name        = null;
     private int                ibs         = 1024;
     private int                obs         = 1024;
     private int                framing     = -1;

@@ -424,7 +424,7 @@ JNIEXPORT jint JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceRead
     jboolean  isCopy;
 
     bytes = (*env)->GetByteArrayElements (env, b, &isCopy);
-    ret = read ((int)sd, bytes, (size_t)length);
+    ret = read ((int)sd, bytes + offset, (size_t)length);
     (*env)->ReleaseByteArrayElements (env, b, bytes, 0);
     return (ret);
 }
@@ -442,7 +442,7 @@ JNIEXPORT jint JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceWrite
     jboolean  isCopy;
 
     bytes = (*env)->GetByteArrayElements (env, b, &isCopy);
-    ret = write ((int)sd, bytes, (size_t)length);
+    ret = write ((int)sd, bytes + offset, (size_t)length);
     tcdrain ((int)sd);
     (*env)->ReleaseByteArrayElements (env, b, bytes, 0);
     return (ret); 
