@@ -8,8 +8,12 @@ JAVASRC		= 	src/$(JAVA_PKG_DIR)/FreebsdDriver.java \
 			src/$(JAVA_PKG_DIR)/FreebsdSerial.java \
 			src/$(JAVA_PKG_DIR)/FreebsdParallel.java
 
-JAVAHFILES	=	src/$(JAVA_PKG_DIR)/freebsd_io_comm_FreebsdParallel.h \
-			src/$(JAVA_PKG_DIR)/freebsd_io_comm_FreebsdSerial.h
+JAVAHFILES	=	src/$(JAVA_PKG_DIR)/org_freebsd_io_comm_FreebsdParallel.h \
+			src/$(JAVA_PKG_DIR)/org_freebsd_io_comm_FreebsdSerial.h \
+			src/$(JAVA_PKG_DIR)/javax_comm_SerialPort.h \
+			src/$(JAVA_PKG_DIR)/javax_comm_SerialPortEvent.h \
+			src/$(JAVA_PKG_DIR)/javax_comm_ParallelPort.h \
+			src/$(JAVA_PKG_DIR)/javax_comm_ParallelPortEvent.h
 
 LIBS		=	lib/libSerial.so \
 			lib/libParallel.so
@@ -42,8 +46,8 @@ install: all
 #
 clean:
 	rm -rf jar
-	rm -rf src/$(JAVA_PKG_DIR)/*.class
-	rm -f lib
+	rm -f src/$(JAVA_PKG_DIR)/*.class
+	rm -rf lib
 	rm -f $(JAVAHFILES)
 # 
 # Actual jar file build
@@ -58,89 +62,49 @@ $(JARFILE):		$(CLASSES)
 #
 $(CLASSES):	$(JAVASRC)
 
-src/$(JAVA_PKG_DIR)/freebsd_io_comm_FreebsdParallel.h:	$(CLASSES)
+src/$(JAVA_PKG_DIR)/org_freebsd_io_comm_FreebsdParallel.h:	$(CLASSES)
 	cd src/$(JAVA_PKG_DIR); \
 	$(JAVAH) -jni -classpath ../../../..:$(JAVAC_CLASSPATH) org.freebsd.io.comm.FreebsdParallel
 
-src/$(JAVA_PKG_DIR)/freebsd_io_comm_FreebsdSerial.h:	$(CLASSES)
+src/$(JAVA_PKG_DIR)/org_freebsd_io_comm_FreebsdSerial.h:	$(CLASSES)
 	cd src/$(JAVA_PKG_DIR); \
 	$(JAVAH) -jni -classpath ../../../..:$(JAVAC_CLASSPATH) org.freebsd.io.comm.FreebsdSerial
+
+src/$(JAVA_PKG_DIR)/javax_comm_SerialPort.h:	$(JAVA_HOME)/jre/lib/ext/comm.jar
+	cd src/$(JAVA_PKG_DIR); \
+	$(JAVAH) -jni -classpath $(JAVAC_CLASSPATH) javax.comm.SerialPort
+
+src/$(JAVA_PKG_DIR)/javax_comm_SerialPortEvent.h:	$(JAVA_HOME)/jre/lib/ext/comm.jar
+	cd src/$(JAVA_PKG_DIR); \
+	$(JAVAH) -jni -classpath $(JAVAC_CLASSPATH) javax.comm.SerialPortEvent
+
+src/$(JAVA_PKG_DIR)/javax_comm_ParallelPort.h:	$(JAVA_HOME)/jre/lib/ext/comm.jar
+	cd src/$(JAVA_PKG_DIR); \
+	$(JAVAH) -jni -classpath $(JAVAC_CLASSPATH) javax.comm.ParallelPort
+
+src/$(JAVA_PKG_DIR)/javax_comm_ParallelPortEvent.h:	$(JAVA_HOME)/jre/lib/ext/comm.jar
+	cd src/$(JAVA_PKG_DIR); \
+	$(JAVAH) -jni -classpath $(JAVAC_CLASSPATH) javax.comm.ParallelPortEvent
 
 #
 # Parallel driver JNI part
 #
 lib/libParallel.so:	src/$(JAVA_PKG_DIR)/libParallel.c \
-			src/$(JAVA_PKG_DIR)/freebsd_io_comm_FreebsdParallel.h
+			src/$(JAVA_PKG_DIR)/org_freebsd_io_comm_FreebsdParallel.h \
+			src/$(JAVA_PKG_DIR)/javax_comm_ParallelPort.h \
+			src/$(JAVA_PKG_DIR)/javax_comm_ParallelPortEvent.h
 	if [ ! -d lib ]; then mkdir lib; fi
 	gcc $(CFLAGS) -o lib/libParallel.so src/$(JAVA_PKG_DIR)/libParallel.c 
 #
 # Serial driver JNI part
 #
 lib/libSerial.so:	src/$(JAVA_PKG_DIR)/libSerial.c \
-			src/$(JAVA_PKG_DIR)/freebsd_io_comm_FreebsdSerial.h
+			src/$(JAVA_PKG_DIR)/org_freebsd_io_comm_FreebsdSerial.h \
+			src/$(JAVA_PKG_DIR)/javax_comm_SerialPort.h \
+			src/$(JAVA_PKG_DIR)/javax_comm_SerialPortEvent.h
 	if [ ! -d lib ]; then mkdir lib; fi
 	gcc $(CFLAGS) -o lib/libSerial.so src/$(JAVA_PKG_DIR)/libSerial.c 
 
 .java.class:
 	$(JAVAC) -classpath $(JAVAC_CLASSPATH) $*.java
 	
-#
-#JAVAC=javac
-#OBJDIR= obj
-#JARFILE=jar/CommDriver.jar
-#JFLAGS=
-#LIBDIR=/usr/local/lib
-#CFLAGS= -O2 -shared -I /usr/java/include -I /usr/java/include/freebsd -L /usr/java/lib/i386/green_threads/
-#obj/%.class: src/%.java
-#	cd src;\
-#	$(JAVAC) ../$< $(JFLAGS) -d ../obj
-#
-#all: $(OBJ) jar libs
-#
-#$(JARFILE): $(CLASSES)
-#	cd classes; \
-#	jar -cvf0 ../$(JARFILE) org/freebsd/io/comm/ 
-#	cp jar/* tests/sun/
-#	cp jar/* tests/java/
-#
-#jar: $(JARFILE)
-#
-#clean:
-#	rm -f src/org/freebsd/io/comm*~ *~ 
-#	rm -f src/org/freebsd/io/comm/*~
-#	rm -rf jar/*.jar
-#	rm -rf obj/*
-#	rm -f doc/*
-#	rm -f lib/*
-#
-#mrproper: clean
-#	rm -rf obj/*
-#	rm -rf jar/*
-#
-#doc/tree.html:
-#	cd src; \
-#	javadoc -package -version -author -private -d ../doc/ org.freebsd.io.comm
-#
-#doc: $(SRC) doc/tree.html
-#
-#src/org/freebsd/io/comm/org_freebsd_io_comm_FreebsdParallel.h: src/org/freebsd/io/comm/libParallel.c
-#	cd obj; \
-#	javah -jni -d ../src/org/freebsd/io/comm/ org.freebsd.io.comm.FreebsdParallel
-#
-##src/org/freebsd/io/comm/org_freebsd_io_comm_FreebsdSerial.h: src/org/freebsd/io/comm/libSerial.c
-#	cd obj; \
-#	javah -jni -d ../src/org/freebsd/io/comm/ org.freebsd.io.comm.FreebsdSerial
-#
-#lib/libParallel.so:  src/org/freebsd/io/comm/libParallel.c src/org/freebsd/io/comm/org_freebsd_io_comm_FreebsdParallel.h
-#	gcc $(CFLAGS) -o lib/libParallel.so src/org/freebsd/io/comm/libParallel.c 
-#
-#lib/libSerial.so:  src/org/freebsd/io/comm/libSerial.c src/org/freebsd/io/comm/org_freebsd_io_comm_FreebsdSerial.h
-#	gcc $(CFLAGS) -o lib/libSerial.so src/org/freebsd/io/comm/libSerial.c 
-#
-#
-#libs: lib/libParallel.so lib/libSerial.so
-#
-#install: libs
-#	install -c -o bin -g bin -m 0444 lib/libParallel.so $(LIBDIR)
-#	install -c -o bin -g bin -m 0444 lib/libSerial.so $(LIBDIR)
-#####

@@ -29,17 +29,5 @@
 *
 */
                              
-/* javax.comm.ParallelPort constants */
-#define LPT_MODE_ANY 	10
-#define LPT_MODE_ECP	11
-#define LPT_MODE_EPP	12
-#define LPT_MODE_NIBBLE	13
-#define LPT_MODE_PS2	14
-#define LPT_MODE_SPP	15
-
-/* javax.comm.ParallelPortEvent constants */
-#define PAR_EV_BUFFER	16
-#define PAR_EV_ERROR	17
 #define SSIZE_MAX 8
-
 void IOException( JNIEnv*, char*);

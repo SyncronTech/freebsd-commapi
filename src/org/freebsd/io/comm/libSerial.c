@@ -30,6 +30,8 @@
 */
 
 #include <jni.h>
+#include "javax_comm_SerialPort.h"
+#include "javax_comm_SerialPortEvent.h"
 #include "org_freebsd_io_comm_FreebsdSerial.h"
 #include "libSerial.h"
 
@@ -159,28 +161,33 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceSetFlowContr
         throw_exception (env, IOEXCEPTION, "tcgetattr ", strerror (errno));
         return;
     }
+
+    tty.c_cflag &= ~CRTSCTS;
+    tty.c_iflag &= ~(IXON | IXOFF);
+
     switch ((int)i)
     {
-        case 0:		/* SerialPort.FLOWCONTROL_NONE */
-            tty.c_cflag &= ~ (IXON | IXOFF | CRTSCTS);
+        case javax_comm_SerialPort_FLOWCONTROL_NONE:
             break;
-        case 1:		/* SerialPort.FLOWCONTROL_RTSCTS_IN */
+        case javax_comm_SerialPort_FLOWCONTROL_RTSCTS_IN:
             tty.c_cflag |= CRTS_IFLOW;
             break;
-        case 2:		/* SerialPort.FLOWCONTROL_RTSCTS_OUT */
+        case javax_comm_SerialPort_FLOWCONTROL_RTSCTS_OUT:
             tty.c_cflag |= CCTS_OFLOW;
             break;
-        case 3:		/* SerialPort.FLOWCONTROL_RTSCTS_IN/OUT */
+        case javax_comm_SerialPort_FLOWCONTROL_RTSCTS_IN |
+             javax_comm_SerialPort_FLOWCONTROL_RTSCTS_OUT:
             tty.c_cflag |= CRTSCTS;
             break;
-        case 4:		/* SerialPort.FLOWCONTROL_XONXOFF_IN */
-            tty.c_cflag |= IXOFF;
+        case javax_comm_SerialPort_FLOWCONTROL_XONXOFF_IN:
+            tty.c_iflag |= IXOFF;
             break;
-        case 8:		/* SerialPort.FLOWCONTROL_XONXOFF_OUT */
-            tty.c_cflag |= IXON;
+        case javax_comm_SerialPort_FLOWCONTROL_XONXOFF_OUT:
+            tty.c_iflag |= IXON;
             break;
-        case 12:	/* SerialPort.FLOWCONTROL_XONXOFF_IN/OUT */
-            tty.c_cflag |= IXON | IXOFF;
+        case javax_comm_SerialPort_FLOWCONTROL_XONXOFF_IN |
+             javax_comm_SerialPort_FLOWCONTROL_XONXOFF_OUT:
+            tty.c_iflag |= IXON | IXOFF;
             break;
     }
     if (tcsetattr ((int)sd, TCSAFLUSH, &tty) < 0)
@@ -192,8 +199,6 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceSetFlowContr
 
 tcflag_t set_stopbits (JNIEnv *env, jint sbits, tcflag_t c_cflag)
 {
-    tcflag_t c = c_cflag & ~CSIZE;
-
     switch (sbits)
     {
         case 1:         /* SerialPort.STOPBITS_1 */
@@ -221,6 +226,7 @@ tcflag_t set_databits (JNIEnv *env, jint dbits, tcflag_t c_cflag)
 {
     tcflag_t c = c_cflag & ~CSIZE;
 
+	printf ("*** databits=%d\n", (int) dbits);
     switch (dbits)
     {
         case 5:		/* SerialPort.DATABITS_5 */
@@ -296,9 +302,13 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceSetSerialPor
         throw_exception (env, USCOEXCEPTION, "SetSerialPortParams ",
                          strerror (errno));
     }
+    printf ("cflags init %X\n", (unsigned int) tty.c_cflag);
     tty.c_cflag = set_parity (env, p, tty.c_cflag);
+    printf ("cflags par set %X\n", (unsigned int) tty.c_cflag);
     tty.c_cflag = set_databits (env, d, tty.c_cflag);
+    printf ("cflags databits set %X\n", (unsigned int) tty.c_cflag);
     tty.c_cflag = set_stopbits (env, s, tty.c_cflag);
+    printf ("cflags stopbits done final %X\n", (unsigned int) tty.c_cflag);
 
     if (tcsetattr ((int)sd, TCSAFLUSH, &tty) < 0)
     {
@@ -623,16 +633,16 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceEventLoop
   	if (state!=old_state)
   		{
 	  		
-  		if( state & TIOCM_CD ) (*env)->CallVoidMethod( env, jobj, method,(jint)SPE_CD, JNI_TRUE );
-  		if( state & TIOCM_RI ) (*env)->CallVoidMethod( env, jobj, method,(jint)SPE_RI, JNI_TRUE );
-  		if( state & TIOCM_CTS ) (*env)->CallVoidMethod( env, jobj, method,(jint)SPE_CTS, JNI_TRUE );
-		if( state & TIOCM_DSR ) (*env)->CallVoidMethod( env, jobj, method,(jint)SPE_DSR, JNI_TRUE );
+  		if( state & TIOCM_CD ) (*env)->CallVoidMethod( env, jobj, method,(jint)javax_comm_SerialPortEvent_CD, JNI_TRUE );
+  		if( state & TIOCM_RI ) (*env)->CallVoidMethod( env, jobj, method,(jint)javax_comm_SerialPortEvent_RI, JNI_TRUE );
+  		if( state & TIOCM_CTS ) (*env)->CallVoidMethod( env, jobj, method,(jint)javax_comm_SerialPortEvent_CTS, JNI_TRUE );
+		if( state & TIOCM_DSR ) (*env)->CallVoidMethod( env, jobj, method,(jint)javax_comm_SerialPortEvent_DSR, JNI_TRUE );
   		old_state=state;
   		}
   		
   	if ( size > 0 )
   		{
-  		(*env)->CallVoidMethod( env, jobj, method,(jint)SPE_DATA_AVAILABLE, JNI_TRUE );
+  		(*env)->CallVoidMethod( env, jobj, method,(jint)javax_comm_SerialPortEvent_DATA_AVAILABLE, JNI_TRUE );
   		}
   	interrupted = (*env)->CallStaticBooleanMethod( env, jthread, interrupt );
   	}
