@@ -482,6 +482,8 @@ JNIEXPORT jint JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceRead
 
     bytes = (*env)->GetByteArrayElements (env, b, &isCopy);
     ret = read ((int)sd, bytes + offset, (size_t)length);
+    if (ret == -1 && errno == EAGAIN)
+        ret = 0;
     (*env)->ReleaseByteArrayElements (env, b, bytes, 0);
 
     if (restoreBlocking)
