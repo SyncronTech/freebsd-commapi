@@ -165,7 +165,10 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceSetReceiveTi
     if (i > 0) {
 
         tty.c_cc [VMIN] = 0;
-        tty.c_cc [VTIME] = i;
+        tty.c_cc [VTIME] = i / 100;
+        if ((i % 100) != 0)
+            tty.c_cc [VTIME]++;
+        
     }
     else {
 
