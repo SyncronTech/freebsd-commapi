@@ -2,6 +2,7 @@ Version 0.6
 
    - Turn on CLOCAL flag to avoid hangs when modem signals change.
      (is this good or not ?)
+   - Fixed first argument to select
 
 Version 0.5
 
