@@ -1,7 +1,4 @@
 
-This is the first realease of FreeBSD's port of the JAVAComm API.
-It should thus be considered as beta even if tests where enough satisfying
-to release this code.
 
 Serial Support
 --------------
