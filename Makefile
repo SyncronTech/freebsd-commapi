@@ -1,12 +1,12 @@
 JAVA_PKG_DIR	=	org/freebsd/io/comm
 
-CLASSES		= 	src/$(JAVA_PKG_DIR)/FreebsdDriver.class \
-			src/$(JAVA_PKG_DIR)/FreebsdSerial.class \
-			src/$(JAVA_PKG_DIR)/FreebsdParallel.class
+CLASSES		= 	src/$(JAVA_PKG_DIR)/FreebsdSerial.class \
+			src/$(JAVA_PKG_DIR)/FreebsdParallel.class \
+			src/$(JAVA_PKG_DIR)/FreebsdDriver.class
 
-JAVASRC		= 	src/$(JAVA_PKG_DIR)/FreebsdDriver.java \
-			src/$(JAVA_PKG_DIR)/FreebsdSerial.java \
-			src/$(JAVA_PKG_DIR)/FreebsdParallel.java
+JAVASRC		= 	src/$(JAVA_PKG_DIR)/FreebsdSerial.java \
+			src/$(JAVA_PKG_DIR)/FreebsdParallel.java \
+			src/$(JAVA_PKG_DIR)/FreebsdDriver.java
 
 JAVAHFILES	=	src/$(JAVA_PKG_DIR)/org_freebsd_io_comm_FreebsdParallel.h \
 			src/$(JAVA_PKG_DIR)/org_freebsd_io_comm_FreebsdSerial.h \
@@ -24,7 +24,7 @@ JAR		=	$(JAVA_HOME)/bin/jar
 JAVAC_CLASSPATH	=	$(JAVA_HOME)/jre/lib/ext/comm.jar
 JAVAH		=	$(JAVA_HOME)/bin/javah
 JARFILE		=	jar/CommDriver.jar
-CFLAGS		= 	-O2 -shared -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/freebsd
+CFLAGS		= 	-O2 -shared -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/freebsd -I$(JAVA_HOME)/include/bsd
 
 .SUFFIXES:	.java .class
 
@@ -107,5 +107,5 @@ lib/libSerial.so:	src/$(JAVA_PKG_DIR)/libSerial.c \
 	gcc $(CFLAGS) -o lib/libSerial.so src/$(JAVA_PKG_DIR)/libSerial.c 
 
 .java.class:
-	$(JAVAC) -classpath $(JAVAC_CLASSPATH) $*.java
+	$(JAVAC) -classpath src:$(JAVAC_CLASSPATH) $*.java
 	
