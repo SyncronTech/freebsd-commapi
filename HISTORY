@@ -4,7 +4,8 @@ Version 0.4
      system property "org.freebsd.io.comm.debug" to "true".
    - Background threads are now daemon threads. This was
      not the case in earlier versions, which caused programs
-     not to stop normally.
+     not to stop normally. Thanks for Sebastiaan van Erk <sebster@sebster.com>
+     for pointing this out.
 
 Version 0.3
 
