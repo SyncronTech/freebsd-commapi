@@ -201,19 +201,19 @@ tcflag_t set_stopbits (JNIEnv *env, jint sbits, tcflag_t c_cflag)
 {
     switch (sbits)
     {
-        case 1:         /* SerialPort.STOPBITS_1 */
+        case javax_comm_SerialPort_STOPBITS_1:
             /*
              * clear the two stop bits field in the control flags
              */
             c_cflag &= ~CSTOPB;
             break;
-        case 2:         /* SerialPort.STOPBITS_2 */
+        case javax_comm_SerialPort_STOPBITS_2:
             /*
              * set the two stop bits field in the control flags
              */
             c_cflag |= CSTOPB;
             break;
-        case 3:         /* SerialPort.STOPBITS_1_5 */
+        case javax_comm_SerialPort_STOPBITS_1_5:
         default:
             throw_exception (env, USCOEXCEPTION, "set_stopbits ",
                              "invalid stopbits specified");
@@ -228,16 +228,16 @@ tcflag_t set_databits (JNIEnv *env, jint dbits, tcflag_t c_cflag)
 
     switch (dbits)
     {
-        case 5:		/* SerialPort.DATABITS_5 */
+        case javax_comm_SerialPort_DATABITS_5:
             c_cflag = (c | CS5);
             break;
-        case 6:		/* SerialPort.DATABITS_6 */
+        case javax_comm_SerialPort_DATABITS_6:
             c_cflag = (c | CS6);
             break;
-        case 7:		/* SerialPort.DATABITS_7 */
+        case javax_comm_SerialPort_DATABITS_7:
             c_cflag = (c | CS7);
             break;
-        case 8:		/* SerialPort.DATABITS_8 */
+        case javax_comm_SerialPort_DATABITS_8:
             c_cflag = (c | CS8);
             break;
         default:
@@ -252,27 +252,27 @@ tcflag_t set_parity (JNIEnv *env, jint parity, tcflag_t c_cflag)
 {
     switch (parity)
     {
-        case 0:                    /* SerialPort.PARITY_NONE */
+        case javax_comm_SerialPort_PARITY_NONE:
             /*
              * here we clear the parity enabled bit in the control flags
              */
             c_cflag &= ~PARENB;
             break;
-        case 1:                    /* SerialPort.PARITY_ODD */
+        case javax_comm_SerialPort_PARITY_ODD:
             /*
              * here we set the parity enabled and odd bits in the control flags
              */
             c_cflag |= (PARENB | PARODD);
             break;
-        case 2:                    /* SerialPort.PARITY_EVEN */
+        case javax_comm_SerialPort_PARITY_EVEN:
             /*
              * here we set the parity enabled and clear the odd parity bits
              */
             c_cflag |= PARENB;
             c_cflag &= ~PARODD;
             break;
-        case 3:                    /* SerialPort.PARITY_MARK */
-        case 4:                    /* SerialPort.PARITY_SPACE */
+        case javax_comm_SerialPort_PARITY_MARK:
+        case javax_comm_SerialPort_PARITY_SPACE:
         default:
             throw_exception (env, USCOEXCEPTION, "set_parity ",
                              "unsupported parity specified");
