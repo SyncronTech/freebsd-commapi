@@ -110,12 +110,10 @@ JNIEXPORT jint JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceOpen
     /*
      * setup communications port for default of 9600, 8, 1, none
      */
-    tty.c_iflag = INPCK;
-    tty.c_lflag = 0;
-    tty.c_oflag = 0;
-    tty.c_cflag = CREAD | CS8 | CLOCAL;
-    tty.c_cc [VMIN] = 1;
-    tty.c_cc [VTIME] = 0;
+  
+    tcgetattr(fd, &tty);
+    cfmakeraw(&tty);
+
     if (cfsetspeed (&tty, B9600) <0)
     {
         throw_exception (env, IOEXCEPTION, "cfsetspeed ", strerror (errno));
@@ -474,10 +472,10 @@ JNIEXPORT jint JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceRead
         FD_ZERO(&readfds);
         FD_SET(sd, &readfds);
  
-        tv.tv_sec = 0;
-        tv.tv_usec = 1000 * timeout;
+        tv.tv_sec = timeout / 1000;
+        tv.tv_usec = 1000 * (timeout % 1000);
 
-        pollRet = select(1, &readfds, NULL, NULL, &tv);
+        pollRet = select(sd + 1, &readfds, NULL, NULL, &tv);
 /*	pollRet = poll(&pollfds, 1, timeout);*/
         if (pollRet == -1)
            return -1;
@@ -689,7 +687,7 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceEventLoop
         		tv.tv_sec = 1;
         		tv.tv_usec = 0;
 
-        		ret = select(1, &readfds, NULL, NULL, &tv);
+        		ret = select(fd + 1, &readfds, NULL, NULL, &tv);
 		/*	ret=poll(&pollfds, 1, 1000);*/
   			}  
   		while ( (ret < 0) && (errno==EINTR));
