@@ -75,7 +75,10 @@ public class FreebsdSerial extends SerialPort
     */
     static 
     {
-        debug = Boolean.valueOf(System.getProperty("javax.comm.freebsd.debug").booleanValue();
+        String debugFlag = System.getProperty("org.freebsd.io.comm.debug");
+
+        if (debugFlag != null)
+        	debug = Boolean.valueOf(debugFlag).booleanValue();
 
         try
         {
