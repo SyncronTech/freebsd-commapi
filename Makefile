@@ -37,9 +37,10 @@ all: $(JARFILE) $(LIBS)
 # Install stuff
 #
 install: all
-	install -c -o bin -g bin -m 0444 lib/libParallel.so $(JAVA_HOME)/jre/lib/ext
-	install -c -o bin -g bin -m 0444 lib/libSerial.so $(JAVA_HOME)/jre/lib/ext
+	install -c -o bin -g bin -m 0444 lib/libParallel.so $(JAVA_HOME)/jre/lib/i386
+	install -c -o bin -g bin -m 0444 lib/libSerial.so $(JAVA_HOME)/jre/lib/i386
 	install -c -o bin -g bin -m 0444 javax.comm.properties $(JAVA_HOME)/jre/lib
+	install -c -o bin -g bin -m 0444 $(JARFILE) $(JAVA_HOME)/jre/lib/ext
 
 # 
 # Clean all files produced by compile
