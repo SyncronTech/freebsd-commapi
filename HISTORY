@@ -1,6 +1,7 @@
 Version 0.7
 
-   - Added support for /dev/cuaU devices (USB serial port in FreeBSD 5.3 and up)
+   - Added support for /dev/cuaU and /dev/ttyU devices (USB serial port in FreeBSD 5.3 and up)
+   - Added support for /dev/cuad (dialout serial ports in FreeBSD 6.0)
 
 Version 0.6
 
