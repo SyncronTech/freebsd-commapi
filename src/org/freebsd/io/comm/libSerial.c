@@ -42,6 +42,7 @@
 #include <termios.h>
 #include <sys/time.h>
 #include <sys/ttycom.h>
+#include <poll.h>
 
 #define IOEXCEPTION	"java/io/IOException"
 #define USCOEXCEPTION	"javax/comm/UnsupportedCommOperationException"
@@ -579,8 +580,7 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceEventLoop
 {      
 	int state,old_state;
 	int fd;
-	fd_set rfds;
-	struct timeval sleep;
+	struct pollfd pollfds;
 	int size;
 	int ret;
 	
@@ -595,11 +595,10 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceEventLoop
         jthread = (*env)->FindClass( env, "java/lang/Thread" );
         interrupt = (*env)->GetStaticMethodID( env, jthread, "interrupted", "()Z" );
                                                                                 
-        FD_ZERO( &rfds );
-        FD_SET( fd, &rfds );
-        sleep.tv_sec = 1; /* Check every 1 second, or on receive data */
-        sleep.tv_usec = 0;
-         
+	pollfds.fd = fd;
+	pollfds.events = POLLIN;
+	pollfds.revents = 0;
+
         /* Initialization of the current tty state */
         ioctl( fd, TIOCMGET, &old_state);                                                                          
   
@@ -607,7 +606,7 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceEventLoop
   	{
   		do 
   			{
-  			ret=select( fd + 1, &rfds, NULL, NULL, &sleep );
+			ret=poll(&pollfds, 1, 1000);
   			}  
   		while ( (ret < 0) && (errno==EINTR));
  
