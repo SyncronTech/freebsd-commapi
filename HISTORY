@@ -1,0 +1,14 @@
+Version 0.3
+
+   - Support for USB ucom devices added.
+
+Version 0.2
+
+   - Offset bug in read/write fixed
+   - Compiles with native FreeBSD jdk 1.4.0 alpha
+   - Uses BSD make to compile
+
+Version 0.1
+
+   - First version of source code by various contributors.
+     See original README.
