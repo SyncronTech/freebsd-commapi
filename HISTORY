@@ -1,9 +1,7 @@
-Version 0.7
-
-   - Get paraller port include files from /usr/include/dev, not from /sys/dev.
 
 Version 0.6
 
+   - Get paraller port include files from /usr/include/dev, not from /sys/dev.
    - Turn on CLOCAL flag to avoid hangs when modem signals change.
      (is this good or not ?)
    - Fixed first argument to select
