@@ -1,8 +1,8 @@
 JAVA_PKG_DIR	=	org/freebsd/io/comm
 
-CLASSES		= 	classes/$(JAVA_PKG_DIR)/FreebsdDriver.class \
-			classes/$(JAVA_PKG_DIR)/FreebsdSerial.class \
-			classes/$(JAVA_PKG_DIR)/FreebsdParallel.class
+CLASSES		= 	src/$(JAVA_PKG_DIR)/FreebsdDriver.class \
+			src/$(JAVA_PKG_DIR)/FreebsdSerial.class \
+			src/$(JAVA_PKG_DIR)/FreebsdParallel.class
 
 JAVASRC		= 	src/$(JAVA_PKG_DIR)/FreebsdDriver.java \
 			src/$(JAVA_PKG_DIR)/FreebsdSerial.java \
@@ -16,57 +16,74 @@ LIBS		=	lib/libSerial.so \
 
 JAVA_HOME	?= 	/usr/local/jdk1.3.1
 JAVAC		=	$(JAVA_HOME)/bin/javac
+JAR		=	$(JAVA_HOME)/bin/jar
+JAVAC_CLASSPATH	=	$(JAVA_HOME)/jre/lib/ext/comm.jar
 JAVAH		=	$(JAVA_HOME)/bin/javah
 JARFILE		=	jar/CommDriver.jar
-CFLAGS		= 	-O2 -shared -I /usr/java/include -I /usr/java/include/freebsd -L /usr/java/lib/i386/green_threads/
+CFLAGS		= 	-O2 -shared -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/freebsd
+
+.SUFFIXES:	.java .class
 
 #
 # Build jar and libs
 #
-all: $(JARS) $(LIBS)
+all: $(JARFILE) $(LIBS)
+
+#
+# Install stuff
+#
+install: all
+	install -c -o bin -g bin -m 0444 lib/libParallel.so $(JAVA_HOME)/jre/lib/ext
+	install -c -o bin -g bin -m 0444 lib/libSerial.so $(JAVA_HOME)/jre/lib/ext
+	install -c -o bin -g bin -m 0444 javax.comm.properties $(JAVA_HOME)/jre/lib
 
 # 
 # Clean all files produced by compile
 #
 clean:
-	rm -rf jar/*
-	rm -rf classes/*
-	rm -f lib/*
+	rm -rf jar
+	rm -rf src/$(JAVA_PKG_DIR)/*.class
+	rm -f lib
 	rm -f $(JAVAHFILES)
 # 
 # Actual jar file build
 #
 $(JARFILE):		$(CLASSES)
-	cd classes; \
-	jar -cvf ../$(JARFILE) $(JAVA_PKG_DIR)
+	if [ ! -d jar ]; then mkdir jar; fi
+	cd src; \
+	$(JAR) -cvf ../$(JARFILE) $(JAVA_PKG_DIR)/*.class
 
 #
 # Java compilation
 #
 $(CLASSES):	$(JAVASRC)
-	$(JAVAC) -d classes $(JAVASRC)
 
 src/$(JAVA_PKG_DIR)/freebsd_io_comm_FreebsdParallel.h:	$(CLASSES)
-	cd classes; \
-	$(JAVAH) -jni org.freebsd.io.comm.FreebsdParallel
+	cd src/$(JAVA_PKG_DIR); \
+	$(JAVAH) -jni -classpath ../../../..:$(JAVAC_CLASSPATH) org.freebsd.io.comm.FreebsdParallel
 
 src/$(JAVA_PKG_DIR)/freebsd_io_comm_FreebsdSerial.h:	$(CLASSES)
-	cd classes; \
-	$(JAVAH) -jni org.freebsd.io.comm.FreebsdSerial
+	cd src/$(JAVA_PKG_DIR); \
+	$(JAVAH) -jni -classpath ../../../..:$(JAVAC_CLASSPATH) org.freebsd.io.comm.FreebsdSerial
 
 #
 # Parallel driver JNI part
 #
 lib/libParallel.so:	src/$(JAVA_PKG_DIR)/libParallel.c \
 			src/$(JAVA_PKG_DIR)/freebsd_io_comm_FreebsdParallel.h
+	if [ ! -d lib ]; then mkdir lib; fi
 	gcc $(CFLAGS) -o lib/libParallel.so src/$(JAVA_PKG_DIR)/libParallel.c 
 #
 # Serial driver JNI part
 #
 lib/libSerial.so:	src/$(JAVA_PKG_DIR)/libSerial.c \
 			src/$(JAVA_PKG_DIR)/freebsd_io_comm_FreebsdSerial.h
+	if [ ! -d lib ]; then mkdir lib; fi
 	gcc $(CFLAGS) -o lib/libSerial.so src/$(JAVA_PKG_DIR)/libSerial.c 
 
+.java.class:
+	$(JAVAC) -classpath $(JAVAC_CLASSPATH) $*.java
+	
 #
 #JAVAC=javac
 #OBJDIR= obj
