@@ -457,6 +457,8 @@ JNIEXPORT jint JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceRead
     struct pollfd pollfds;
     int       pollRet;
     int       restoreBlocking = 0;
+    fd_set    readfds;
+    struct timeval tv;
 
     if (timeout > 0) {
 
@@ -469,7 +471,14 @@ JNIEXPORT jint JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceRead
 	pollfds.events = POLLIN;
 	pollfds.revents = 0;
 
-	pollRet = poll(&pollfds, 1, timeout);
+        FD_ZERO(&readfds);
+        FD_SET(sd, &readfds);
+ 
+        tv.tv_sec = 0;
+        tv.tv_usec = 1000 * timeout;
+
+        pollRet = select(1, &readfds, NULL, NULL, &tv);
+/*	pollRet = poll(&pollfds, 1, timeout);*/
         if (pollRet == -1)
            return -1;
 
@@ -649,6 +658,8 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceEventLoop
 	struct pollfd pollfds;
 	int size;
 	int ret;
+        fd_set readfds;
+        struct timeval tv;
 	
         jfieldID jfield;  
         jmethodID method, interrupt;
@@ -672,7 +683,14 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceEventLoop
   	{
   		do 
   			{
-			ret=poll(&pollfds, 1, 1000);
+        		FD_ZERO(&readfds);
+        		FD_SET(fd, &readfds);
+ 
+        		tv.tv_sec = 1;
+        		tv.tv_usec = 0;
+
+        		ret = select(1, &readfds, NULL, NULL, &tv);
+		/*	ret=poll(&pollfds, 1, 1000);*/
   			}  
   		while ( (ret < 0) && (errno==EINTR));
  
