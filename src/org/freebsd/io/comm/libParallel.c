@@ -38,8 +38,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/errno.h>
-#include </sys/dev/ppbus/ppi.h>
-#include </sys/dev/ppbus/ppbconf.h>
+#include <dev/ppbus/ppi.h>
+#include <dev/ppbus/ppbconf.h>
 #include "libParallel.h"
 #include <signal.h>
 #include <fcntl.h>
