@@ -316,29 +316,28 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceSetSerialPor
 JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceSetDTR
   (JNIEnv *env, jobject jobj, jint sd, jboolean flag)
 {
-    struct termios tty;
-    
-    /* get termios structure for our serial port */
-    if (tcgetattr ((int)sd, &tty) < 0)
+    int result;
+
+    if (ioctl ((int)sd, TIOCMGET, &result) < 0)
     {
-        throw_exception (env, IOEXCEPTION, "tcgetattr ", strerror (errno));
+        throw_exception (env, IOEXCEPTION, "ioctl TIOCMGET ", strerror (errno));
         return;
     }
 
     if (flag == JNI_TRUE)
     {
-        tty.c_cflag |= CDTR_IFLOW;
+        result |= TIOCM_DTR;
     }
     else
     {
-        tty.c_cflag &= ~CDTR_IFLOW;
+        result &= ~TIOCM_DTR;
     }
 
-    if (tcsetattr ((int)sd, TCSAFLUSH, &tty) < 0)
+    if (ioctl ((int)sd, TIOCMSET, &result) < 0)
     {
-        throw_exception (env, IOEXCEPTION, "tcsetattr ", strerror (errno));
+        throw_exception (env, IOEXCEPTION, "ioctl TIOCMSET ", strerror (errno));
+        return;
     }
-    return;
 }
 
 /*
@@ -349,29 +348,28 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceSetDTR
 JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceSetRTS
   (JNIEnv *env, jobject jobj, jint sd, jboolean flag)
 {
-    struct termios tty;
-                             
-    /* get termios structure for our serial port */
-    if (tcgetattr ((int)sd, &tty) < 0)
+    int result;
+
+    if (ioctl ((int)sd, TIOCMGET, &result) < 0)
     {
-        throw_exception (env, IOEXCEPTION, "tcgetattr ", strerror (errno));
+        throw_exception (env, IOEXCEPTION, "ioctl TIOCMGET ", strerror (errno));
         return;
     }
- 
+
     if (flag == JNI_TRUE)
     {
-        tty.c_cflag |= CRTS_IFLOW;
+        result |= TIOCM_RTS;
     }
-    else    
+    else
     {
-        tty.c_cflag &= ~CRTS_IFLOW;
+        result &= ~TIOCM_RTS;
     }
-            
-    if (tcsetattr ((int)sd, TCSAFLUSH, &tty) < 0)
+
+    if (ioctl ((int)sd, TIOCMSET, &result) < 0)
     {
-        throw_exception (env, IOEXCEPTION, "tcsetattr ", strerror (errno));
+        throw_exception (env, IOEXCEPTION, "ioctl TIOCMSET ", strerror (errno));
+        return;
     }
-    return;    
 }
 
 /*
