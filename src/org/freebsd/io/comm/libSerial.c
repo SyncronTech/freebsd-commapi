@@ -127,7 +127,7 @@ JNIEXPORT jint JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceOpen
         return (-1);
     }
     fcntl (fd, F_SETOWN, getpid ());
-    fcntl (fd, F_SETFL, FASYNC);
+    fcntl (fd, F_SETFL, 0);
     return ((jint)fd);
 }
 
@@ -143,44 +143,6 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceSendBreak
      * Freebsd ignores the len parameter according to the man pages...
      */
     tcsendbreak ((int)sd, 0);
-}
-
-/*
- * Class:     org_freebsd_io_comm_FreebsdSerial
- * Method:    deviceSetReceiveTimeout
- * Signature: (II)V
- */
-JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceSetReceiveTimeout
-  (JNIEnv *env, jobject jobj, jint sd, jint i)
-{
-    struct termios tty;
-
-    /* get termios structure for our serial port */
-    if (tcgetattr ((int)sd, &tty) < 0)
-    {
-        throw_exception (env, IOEXCEPTION, "tcgetattr ", strerror (errno));
-        return;
-    }
-
-    if (i > 0) {
-
-        tty.c_cc [VMIN] = 0;
-        tty.c_cc [VTIME] = i / 100;
-        if ((i % 100) != 0)
-            tty.c_cc [VTIME]++;
-        
-    }
-    else {
-
-        tty.c_cc [VMIN] = 1;
-        tty.c_cc [VTIME] = 0;
-    }
-    
-    if (tcsetattr ((int)sd, TCSAFLUSH, &tty) < 0)
-    {
-        throw_exception (env, IOEXCEPTION, "tcsetattr ", strerror (errno));
-        return;
-    }
 }
 
 /*
@@ -455,11 +417,29 @@ JNIEXPORT jint JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceAvailable
  * Signature: (I[BII)I
  */
 JNIEXPORT jint JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceRead
-  (JNIEnv *env, jobject jobj, jint sd, jbyteArray b, jint offset, jint length)
+  (JNIEnv *env, jobject jobj, jint sd, jbyteArray b, jint offset, jint length, jint timeout)
 {
     int       ret = 0;
     jbyte    *bytes;
     jboolean  isCopy;
+    struct pollfd pollfds;
+    int       pollRet;
+
+    if (timeout > 0) {
+
+/*
+ * Perform timeout processing with poll(2) instead
+ * of using termios VTIME feature, because libc_r library
+ * doesn't handle VTIME processing correctly.
+ */
+	pollfds.fd = sd;
+	pollfds.events = POLLIN;
+	pollfds.revents = 0;
+
+	pollRet = poll(&pollfds, 1, timeout);
+        if (pollRet <= 0)
+           return pollRet;
+    }
 
     bytes = (*env)->GetByteArrayElements (env, b, &isCopy);
     ret = read ((int)sd, bytes + offset, (size_t)length);

@@ -181,7 +181,6 @@ public class FreebsdSerial extends SerialPort
 
 private native int  deviceOpen (String port) throws IOException;
 private native void deviceSendBreak(int sd, int i);
-private native void deviceSetReceiveTimeout(int sd, int i);
 
     protected boolean checkFlowControlModes (int modes)
     {
@@ -544,7 +543,7 @@ private native void deviceEventLoop();
 
 private native void deviceClose (int sd) throws IOException;
 private native int  deviceAvailable(int sd) throws IOException;
-private native int  deviceRead(int sd, byte b[], int offset, int length)
+private native int  deviceRead(int sd, byte b[], int offset, int length, int timeout)
                         throws IOException;
 private native int  deviceWrite(int sd, byte b[], int offset, int length)
                         throws IOException;
@@ -619,13 +618,11 @@ private native void deviceFlush(int sd);
         throws UnsupportedCommOperationException
     {
         timeout = i;
-        deviceSetReceiveTimeout(sd, i);
     }
 
     public void disableReceiveTimeout()
     {
         timeout = -1;
-        deviceSetReceiveTimeout(sd, -1);
     }
 
     public boolean isReceiveTimeoutEnabled()
@@ -725,7 +722,7 @@ private native void deviceFlush(int sd);
             int   i   = 0;
             int   v   = -1;
             
-            i = deviceRead (sd, b, 0, 1);
+            i = deviceRead (sd, b, 0, 1, timeout);
             if (i == 1)
             {
                 v = b[0] & 255;
@@ -745,7 +742,7 @@ private native void deviceFlush(int sd);
         {
             int   i   = 0;
 
-            i = deviceRead (sd, b, 0, b.length);
+            i = deviceRead (sd, b, 0, b.length, timeout);
             if (debug == true)
             {
                 System.out.println ("SerialInputStream.read: length " + i + 
@@ -762,7 +759,7 @@ private native void deviceFlush(int sd);
         {
             int i = 0;
 
-            i = deviceRead (sd, b, offset, length);
+            i = deviceRead (sd, b, offset, length, timeout);
             if (debug == true)
             {
                 System.out.println ("SerialInputStream.read: length " + i + 
