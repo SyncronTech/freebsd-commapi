@@ -53,7 +53,21 @@ public class FreebsdDriver implements CommDriver {
 		File dev = new File( "/dev" );
 		String[] devs = dev.list();
 
-		String[] portPrefix = { "cuaa" };
+                String[] portPrefix = { "ttyd", //general purpose serial ports
+                                        "cuaa", //dialout serial ports
+                                        "ttyA", //Specialix SI/XIO dialin ports
+                                        "cuaA", //Specialix SI/XIO dialout ports
+                                        "ttyD", //Digiboard - 16 dialin ports
+                                        "cuaD", //Digiboard - 16 dialout ports
+                                        "ttyE", //Stallion EasyIO (stl) dialin ports
+                                        "cuaE", //Stallion EasyIO (stl) dialout ports
+                                        "ttyF", //Stallion Brumby (stli) dialin ports
+                                        "cuaF", //Stallion Brumby (stli) dialout ports
+                                        "ttyR", //Rocketport dialin ports
+                                        "cuaR", //Rocketport dialout ports
+                                        "stl" //Stallion EasyIO board or Brumby N
+                };
+
 		for( int i = 0; i < devs.length; i++ ) {
 			for( int p = 0; p < portPrefix.length; p++ ) {
 				if( devs[i].startsWith( portPrefix[p] ) ) {
