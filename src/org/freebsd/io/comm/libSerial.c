@@ -226,7 +226,6 @@ tcflag_t set_databits (JNIEnv *env, jint dbits, tcflag_t c_cflag)
 {
     tcflag_t c = c_cflag & ~CSIZE;
 
-	printf ("*** databits=%d\n", (int) dbits);
     switch (dbits)
     {
         case 5:		/* SerialPort.DATABITS_5 */
@@ -302,13 +301,9 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceSetSerialPor
         throw_exception (env, USCOEXCEPTION, "SetSerialPortParams ",
                          strerror (errno));
     }
-    printf ("cflags init %X\n", (unsigned int) tty.c_cflag);
     tty.c_cflag = set_parity (env, p, tty.c_cflag);
-    printf ("cflags par set %X\n", (unsigned int) tty.c_cflag);
     tty.c_cflag = set_databits (env, d, tty.c_cflag);
-    printf ("cflags databits set %X\n", (unsigned int) tty.c_cflag);
     tty.c_cflag = set_stopbits (env, s, tty.c_cflag);
-    printf ("cflags stopbits done final %X\n", (unsigned int) tty.c_cflag);
 
     if (tcsetattr ((int)sd, TCSAFLUSH, &tty) < 0)
     {
