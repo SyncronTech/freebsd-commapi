@@ -456,6 +456,7 @@ JNIEXPORT jint JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceRead
     jboolean  isCopy;
     struct pollfd pollfds;
     int       pollRet;
+    int       restoreBlocking = 0;
 
     if (timeout > 0) {
 
@@ -469,13 +470,23 @@ JNIEXPORT jint JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceRead
 	pollfds.revents = 0;
 
 	pollRet = poll(&pollfds, 1, timeout);
-        if (pollRet <= 0)
-           return pollRet;
+        if (pollRet == -1)
+           return -1;
+
+        if (pollRet == 0) {
+
+            fcntl (sd, F_SETFL, O_NONBLOCK);
+            restoreBlocking = 1;
+        }
     }
 
     bytes = (*env)->GetByteArrayElements (env, b, &isCopy);
     ret = read ((int)sd, bytes + offset, (size_t)length);
     (*env)->ReleaseByteArrayElements (env, b, bytes, 0);
+
+    if (restoreBlocking)
+        fcntl(sd, F_SETFL, 0);
+
     return (ret);
 }
 
