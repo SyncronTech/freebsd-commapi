@@ -192,6 +192,8 @@ public final class FreebsdParallel extends ParallelPort {
 				eventLoop();
 			}
 		};
+               
+		monitorThread.setDaemon(true);
 		monitorThread.start(); 
 	}
 

@@ -75,6 +75,8 @@ public class FreebsdSerial extends SerialPort
     */
     static 
     {
+        debug = Boolean.valueOf(System.getProperty("javax.comm.freebsd.debug").booleanValue();
+
         try
         {
             System.loadLibrary("Serial");
@@ -434,6 +436,8 @@ private native void deviceEventLoop();
                      deviceEventLoop();
                      }    
                  };
+
+        monitorThread.setDaemon(true);
         monitorThread.start();
     }
 
