@@ -113,7 +113,7 @@ JNIEXPORT jint JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceOpen
     tty.c_iflag = INPCK;
     tty.c_lflag = 0;
     tty.c_oflag = 0;
-    tty.c_cflag = CREAD | CS8;
+    tty.c_cflag = CREAD | CS8 | CLOCAL;
     tty.c_cc [VMIN] = 1;
     tty.c_cc [VTIME] = 0;
     if (cfsetspeed (&tty, B9600) <0)
