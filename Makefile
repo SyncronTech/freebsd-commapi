@@ -24,7 +24,7 @@ JAR		=	$(JAVA_HOME)/bin/jar
 JAVAC_CLASSPATH	=	$(JAVA_HOME)/jre/lib/ext/comm.jar
 JAVAH		=	$(JAVA_HOME)/bin/javah
 JARFILE		=	jar/CommDriver.jar
-CFLAGS		= 	-O2 -shared -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/freebsd -I$(JAVA_HOME)/include/bsd
+CFLAGS		= 	-O1 -shared -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/freebsd -I$(JAVA_HOME)/include/bsd
 
 .SUFFIXES:	.java .class
 
