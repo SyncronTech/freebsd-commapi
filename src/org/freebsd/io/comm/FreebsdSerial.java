@@ -181,6 +181,7 @@ public class FreebsdSerial extends SerialPort
 
 private native int  deviceOpen (String port) throws IOException;
 private native void deviceSendBreak(int sd, int i);
+private native void deviceSetReceiveThreshold(int sd, int i);
 
     protected boolean checkFlowControlModes (int modes)
     {
@@ -588,11 +589,13 @@ private native void deviceFlush(int sd);
         throws UnsupportedCommOperationException
     {
         threshold = i;
+        deviceSetReceiveThreshold(sd, threshold);
     }
  
     public void disableReceiveThreshold()
     {
         threshold = -1;
+        deviceSetReceiveThreshold(sd, threshold);
     }
 
     public boolean isReceiveThresholdEnabled()

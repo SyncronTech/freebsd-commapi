@@ -147,6 +147,39 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceSendBreak
 
 /*
  * Class:     org_freebsd_io_comm_FreebsdSerial
+ * Method:    deviceSetReceiveThreshold
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceSetReceiveThreshold
+  (JNIEnv *env, jobject jobj, jint sd, jint i)
+{
+    struct termios tty;
+
+    if (tcgetattr ((int)sd, &tty) < 0)
+    {
+        throw_exception (env, USCOEXCEPTION, "SetReceiveThreshold ",
+                         strerror (errno));
+    }
+
+    if (i <= 0)
+       i = 1;
+    else
+       if (i > 255)
+          i = 255;
+
+    printf ("Threshold set to %d\n", i);
+    tty.c_cc[VMIN] = i;
+
+    if (tcsetattr ((int)sd, TCSAFLUSH, &tty) < 0)
+    {
+        throw_exception (env, USCOEXCEPTION, "SetReceiveThreshold ",
+                         strerror (errno));
+    }
+    return;
+}
+
+/*
+ * Class:     org_freebsd_io_comm_FreebsdSerial
  * Method:    deviceSetFlowControl
  * Signature: (II)V
  */
