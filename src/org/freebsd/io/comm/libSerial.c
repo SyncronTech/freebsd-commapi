@@ -44,7 +44,6 @@
 #include <termios.h>
 #include <sys/time.h>
 #include <sys/ttycom.h>
-#include <poll.h>
 
 #define IOEXCEPTION	"java/io/IOException"
 #define USCOEXCEPTION	"javax/comm/UnsupportedCommOperationException"
@@ -452,8 +451,7 @@ JNIEXPORT jint JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceRead
     int       ret = 0;
     jbyte    *bytes;
     jboolean  isCopy;
-    struct pollfd pollfds;
-    int       pollRet;
+    int       selRet;
     int       restoreBlocking = 0;
     fd_set    readfds;
     struct timeval tv;
@@ -461,26 +459,21 @@ JNIEXPORT jint JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceRead
     if (timeout > 0) {
 
 /*
- * Perform timeout processing with poll(2) instead
+ * Perform timeout processing with select(2) instead
  * of using termios VTIME feature, because libc_r library
  * doesn't handle VTIME processing correctly.
  */
-	pollfds.fd = sd;
-	pollfds.events = POLLIN;
-	pollfds.revents = 0;
-
         FD_ZERO(&readfds);
         FD_SET(sd, &readfds);
  
         tv.tv_sec = timeout / 1000;
         tv.tv_usec = 1000 * (timeout % 1000);
 
-        pollRet = select(sd + 1, &readfds, NULL, NULL, &tv);
-/*	pollRet = poll(&pollfds, 1, timeout);*/
-        if (pollRet == -1)
+        selRet = select(sd + 1, &readfds, NULL, NULL, &tv);
+        if (selRet == -1)
            return -1;
 
-        if (pollRet == 0) {
+        if (selRet == 0) {
 
             fcntl (sd, F_SETFL, O_NONBLOCK);
             restoreBlocking = 1;
@@ -653,7 +646,6 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceEventLoop
 {      
 	int state,old_state;
 	int fd;
-	struct pollfd pollfds;
 	int size;
 	int ret;
         fd_set readfds;
@@ -670,10 +662,6 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceEventLoop
         jthread = (*env)->FindClass( env, "java/lang/Thread" );
         interrupt = (*env)->GetStaticMethodID( env, jthread, "interrupted", "()Z" );
                                                                                 
-	pollfds.fd = fd;
-	pollfds.events = POLLIN;
-	pollfds.revents = 0;
-
         /* Initialization of the current tty state */
         ioctl( fd, TIOCMGET, &old_state);                                                                          
   
@@ -688,7 +676,6 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceEventLoop
         		tv.tv_usec = 0;
 
         		ret = select(fd + 1, &readfds, NULL, NULL, &tv);
-		/*	ret=poll(&pollfds, 1, 1000);*/
   			}  
   		while ( (ret < 0) && (errno==EINTR));
  
