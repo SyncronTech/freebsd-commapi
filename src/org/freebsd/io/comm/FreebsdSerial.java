@@ -523,6 +523,7 @@ private native void deviceEventLoop();
 
     public void close()
     {
+        removeEventListener();
         try
         {
             if (sd < 0)

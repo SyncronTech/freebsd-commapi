@@ -90,7 +90,12 @@ public final class FreebsdParallel extends ParallelPort {
 	public native boolean isPrinterTimedOut();
 	
 	/** Close the port */
-	public native void close();
+	public native void deviceClose();
+	public void close()
+        {
+              removeEventListener();
+              deviceClose();
+        }
 
 	/** Receive framing control 
         *@exception UnsupportedCommOperationException if the device does not

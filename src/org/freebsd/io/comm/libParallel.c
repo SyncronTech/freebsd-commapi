@@ -124,7 +124,7 @@ fail:
 }
 
 
-JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdParallel_close( JNIEnv *env,
+JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdParallel_deviceClose( JNIEnv *env,
 	jobject jobj )
 {
 	int fd = get_java_fd( env, jobj );
