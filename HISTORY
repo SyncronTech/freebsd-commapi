@@ -1,3 +1,11 @@
+Version 0.4
+
+   - Serial port supports debugging by setting 
+     system property "org.freebsd.io.comm.debug" to "true".
+   - Background threads are now daemon threads. This was
+     not the case in earlier versions, which caused programs
+     not to stop normally.
+
 Version 0.3
 
    - Support for USB ucom devices added.
