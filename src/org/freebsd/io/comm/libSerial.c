@@ -167,7 +167,6 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceSetReceiveTh
        if (i > 255)
           i = 255;
 
-    printf ("Threshold set to %d\n", i);
     tty.c_cc[VMIN] = i;
 
     if (tcsetattr ((int)sd, TCSAFLUSH, &tty) < 0)
