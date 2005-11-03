@@ -129,7 +129,7 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdParallel_deviceClose( JNI
 {
 	int fd = get_java_fd( env, jobj );
 	jclass jclazz = (*env)->GetObjectClass( env, jobj );
-	jfieldID jfield = (*env)->GetFieldID( env, jclazz, "fd", "I" );
+	jfieldID jfield = (*env)->GetFieldID( env, jclazz, "timeout", "I" );
 	int timeout = (int)( (*env)->GetIntField( env, jobj, jfield ) );
 	u_int8_t status;
 	unsigned int millis;

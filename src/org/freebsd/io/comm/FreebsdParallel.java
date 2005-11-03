@@ -95,6 +95,7 @@ public final class FreebsdParallel extends ParallelPort {
         {
               removeEventListener();
               deviceClose();
+              super.close();
         }
 
 	/** Receive framing control 
