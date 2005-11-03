@@ -1,3 +1,7 @@
+Version 0.8
+
+   - close in paraller port fixed (did not release resources, from Sergey Gordienko <grey@rost.ru>)
+
 Version 0.7
 
    - Added support for /dev/cuaU and /dev/ttyU devices (USB serial port in FreeBSD 5.3 and up)
