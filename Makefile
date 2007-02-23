@@ -18,7 +18,7 @@ JAVAHFILES	=	src/$(JAVA_PKG_DIR)/org_freebsd_io_comm_FreebsdParallel.h \
 LIBS		=	lib/libSerial.so \
 			lib/libParallel.so
 
-JAVA_HOME	?= 	/usr/local/jdk1.3.1
+JAVA_HOME	?= 	/usr/local/diablo-jdk1.5.0
 JAVAC		=	$(JAVA_HOME)/bin/javac
 JAR		=	$(JAVA_HOME)/bin/jar
 JAVAC_CLASSPATH	=	$(JAVA_HOME)/jre/lib/ext/comm.jar

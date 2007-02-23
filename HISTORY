@@ -1,6 +1,9 @@
 Version 0.8
 
    - close in paraller port fixed (did not release resources, from Sergey Gordienko <grey@rost.ru>)
+   - Updated Makefile to be able to build on other architectures than i386 (glewis@freebsd.org)
+   - Added support for the UART serial ports (ttyu/cuau) and removed a few names that
+     don't reference a port, but only a device driver (ucom etc).
 
 Version 0.7
 
