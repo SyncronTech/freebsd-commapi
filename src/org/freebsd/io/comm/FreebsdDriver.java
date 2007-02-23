@@ -54,9 +54,10 @@ public class FreebsdDriver implements CommDriver {
 		String[] devs = dev.list();
 
                 String[] portPrefix = { "ttyd", //general purpose serial ports
-                                        "cuaa", //dialout serial ports
-                                        "cuad", //dialout serial ports in 6.0
-                                        "ucom", //USB serial ports
+                                        "cuaa", //dialout serial ports in 4.X
+                                        "cuad", //dialout serial ports
+                                        "ttyu", //UART dialout ports
+                                        "cuau", //UART dialout ports
                                         "ttyU", //general purpose USB serial ports
                                         "cuaU", //dialout USB serial ports
                                         "ttyA", //Specialix SI/XIO dialin ports
@@ -68,8 +69,7 @@ public class FreebsdDriver implements CommDriver {
                                         "ttyF", //Stallion Brumby (stli) dialin ports
                                         "cuaF", //Stallion Brumby (stli) dialout ports
                                         "ttyR", //Rocketport dialin ports
-                                        "cuaR", //Rocketport dialout ports
-                                        "stl" //Stallion EasyIO board or Brumby N
+                                        "cuaR"  //Rocketport dialout ports
                 };
 
 		for( int i = 0; i < devs.length; i++ ) {
