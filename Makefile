@@ -24,7 +24,8 @@ JAR		=	$(JAVA_HOME)/bin/jar
 JAVAC_CLASSPATH	=	$(JAVA_HOME)/jre/lib/ext/comm.jar
 JAVAH		=	$(JAVA_HOME)/bin/javah
 JARFILE		=	jar/CommDriver.jar
-CFLAGS		= 	-O1 -shared -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/freebsd -I$(JAVA_HOME)/include/bsd
+CFLAGS		= 	-O1 -fPIC -shared -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/freebsd -I$(JAVA_HOME)/include/bsd
+MACHINE_ARCH	?=	i386
 
 .SUFFIXES:	.java .class
 
@@ -37,8 +38,8 @@ all: $(JARFILE) $(LIBS)
 # Install stuff
 #
 install: all
-	install -c -o bin -g bin -m 0444 lib/libParallel.so $(JAVA_HOME)/jre/lib/i386
-	install -c -o bin -g bin -m 0444 lib/libSerial.so $(JAVA_HOME)/jre/lib/i386
+	install -c -o bin -g bin -m 0444 lib/libParallel.so $(JAVA_HOME)/jre/lib/$(MACHINE_ARCH)
+	install -c -o bin -g bin -m 0444 lib/libSerial.so $(JAVA_HOME)/jre/lib/$(MACHINE_ARCH)
 	install -c -o bin -g bin -m 0444 javax.comm.properties $(JAVA_HOME)/jre/lib
 	install -c -o bin -g bin -m 0444 $(JARFILE) $(JAVA_HOME)/jre/lib/ext
 
