@@ -113,6 +113,8 @@ JNIEXPORT jint JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceOpen
     tcgetattr(fd, &tty);
     cfmakeraw(&tty);
 
+    tty.c_cflag |= CLOCAL;
+
     if (cfsetspeed (&tty, B9600) <0)
     {
         throw_exception (env, IOEXCEPTION, "cfsetspeed ", strerror (errno));
@@ -191,12 +193,14 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceSetFlowContr
         return;
     }
 
+    tty.c_cflag &= ~CLOCAL;
     tty.c_cflag &= ~CRTSCTS;
     tty.c_iflag &= ~(IXON | IXOFF);
 
     switch ((int)i)
     {
         case javax_comm_SerialPort_FLOWCONTROL_NONE:
+            tty.c_cflag |= CLOCAL;
             break;
         case javax_comm_SerialPort_FLOWCONTROL_RTSCTS_IN:
             tty.c_cflag |= CRTS_IFLOW;
@@ -210,13 +214,16 @@ JNIEXPORT void JNICALL Java_org_freebsd_io_comm_FreebsdSerial_deviceSetFlowContr
             break;
         case javax_comm_SerialPort_FLOWCONTROL_XONXOFF_IN:
             tty.c_iflag |= IXOFF;
+            tty.c_cflag |= CLOCAL;
             break;
         case javax_comm_SerialPort_FLOWCONTROL_XONXOFF_OUT:
             tty.c_iflag |= IXON;
+            tty.c_cflag |= CLOCAL;
             break;
         case javax_comm_SerialPort_FLOWCONTROL_XONXOFF_IN |
              javax_comm_SerialPort_FLOWCONTROL_XONXOFF_OUT:
             tty.c_iflag |= IXON | IXOFF;
+            tty.c_cflag |= CLOCAL;
             break;
     }
     if (tcsetattr ((int)sd, TCSAFLUSH, &tty) < 0)
