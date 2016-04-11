@@ -1,25 +1,14 @@
+FreeBSD java comm api
+=====================
 
+This is the final resting place for FreeBSD commapi. I'm putting
+this here for historical purposes, as the javacomm API itself has
+retired years ago. Last time I checked there was no official
+download for javacomm jars any more.
 
-Serial Support
---------------
+This stuff used to be available at [syncrontech.org][2]
 
-Serial support is mainly completed thanks to gary R. Shaffer who made 90% of
-the work and gently donated it.
+I myself have moved on using [purejavacomm][1].
 
-Demos are working perfectly with this code. It can nearly be considered as
-final-release.
-
-Parallel Support
-----------------
-
-Parallel support is currently limited to writing bytes to the port in SPP
-mode only. This is ideal to command printers and electronic devices.
-
-PS/2 mode will soon be available and EPP/SPP later.
-
-TODO
----
-Parallel: SPP/EPP support
-Serial  : capture of the BI,FE,OE,PE, OUTPUT_BUFFER_EMPTY events.
-	  really don't know hw to do that...
-
+[1]: https://github.com/nyholku/purejavacomm
+[2]: http://www.syncrontech.org/
